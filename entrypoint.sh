@@ -143,6 +143,8 @@ wait_for_workflow_to_finish() {
     if [ "${propagate_failure}" = true ]
     then
       echo "Propagating failure to upstream job"
+      echo "The workflow id is [${last_workflow_id}]."
+      echo "The workflow logs can be found at ${last_workflow_url}"
       exit 1
     fi
   fi
