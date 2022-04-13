@@ -4,7 +4,7 @@ set -e
 usage_docs() {
   echo ""
   echo "You can use this Github Action with:"
-  echo "- uses: convictional/trigger-workflow-and-wait"
+  echo "- uses: BillKalaitzis/trigger-workflow-and-wait"
   echo "  with:"
   echo "    owner: keithconvictional"
   echo "    repo: myrepo"
