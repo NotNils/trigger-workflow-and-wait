@@ -111,18 +111,19 @@ lets_wait() {
 get_workflow_runs() {
   since=${1:?}
 
-  query="event=workflow_dispatch&created=>=$since${INPUT_GITHUB_USER+&actor=}${INPUT_GITHUB_USER}&per_page=100"
+  query="per_page=100"
 
   echo "Getting workflow runs using query: ${query}" >&2
 
   api "workflows/${INPUT_WORKFLOW_FILE_NAME}/runs?${query}" |
-  jq -r '.workflow_runs[].id' |
+  jq ".workflow_runs[] | select((.event==\"workflow_dispatch\") and ((.created_at | fromdateiso8601) >= $since))" |
+  jq .id |
   sort # Sort to ensure repeatable order, and lexicographically for compatibility with join
 }
 
 trigger_workflow() {
-  START_TIME=$(date +%s)
-  SINCE=$(date -u -Iseconds -d "@$((START_TIME - 120))") # Two minutes ago, to overcome clock skew
+  START_TIME=$(date -u +%s)
+  SINCE=$((START_TIME - 120)) # Two minutes ago, to overcome clock skew
 
   OLD_RUNS=$(get_workflow_runs "$SINCE")
 
