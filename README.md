@@ -9,19 +9,19 @@ When deploying an app you may need to deploy additional services, this Github Ac
 
 ## Arguments
 
-| Argument Name         | Required   | Default     | Description           |
-| --------------------- | ---------- | ----------- | --------------------- |
-| `owner`               | True       | N/A         | The owner of the repository where the workflow is contained. |
-| `repo`                | True       | N/A         | The repository where the workflow is contained. |
-| `github_token`        | True       | N/A         | The Github access token with access to the repository. Its recommended you put it under secrets. |
-| `workflow_file_name`  | True       | N/A         | The reference point. For example, you could use main.yml. |
-| `github_user`         | False      | N/A         | The name of the github user whose access token is being used to trigger the workflow. |
-| `ref`                 | False      | main        | The reference of the workflow run. The reference can be a branch, tag, or a commit SHA. |
-| `waiting_interval`    | False      | 10          | The number of seconds delay between checking for result of run. |
-| `inputs`              | False      | `{}`        | Inputs to pass to the workflow, must be a JSON string |
-| `propagate_failure`   | False      | `true`      | Fail current job if downstream job fails. |
-| `trigger_workflow`    | False      | `true`      | Trigger the specified workflow. |
-| `wait_workflow`       | False      | `true`      | Wait for workflow to finish. |
+| Argument Name            | Required   | Default     | Description           |
+| ---------------------    | ---------- | ----------- | --------------------- |
+| `owner`                  | True       | N/A         | The owner of the repository where the workflow is contained. |
+| `repo`                   | True       | N/A         | The repository where the workflow is contained. |
+| `github_token`           | True       | N/A         | The Github access token with access to the repository. Its recommended you put it under secrets. |
+| `workflow_file_name`     | True       | N/A         | The reference point. For example, you could use main.yml. |
+| `github_user`            | False      | N/A         | The name of the github user whose access token is being used to trigger the workflow. |
+| `ref`                    | False      | main        | The reference of the workflow run. The reference can be a branch, tag, or a commit SHA. |
+| `wait_interval`          | False      | 10          | The number of seconds delay between checking for result of run. |
+| `client_payload`         | False      | `{}`        | Payload to pass to the workflow, must be a JSON string |
+| `propagate_failure`      | False      | `true`      | Fail current job if downstream job fails. |
+| `trigger_workflow`       | False      | `true`      | Trigger the specified workflow. |
+| `wait_workflow`          | False      | `true`      | Wait for workflow to finish. |
 
 
 ## Example
@@ -29,7 +29,7 @@ When deploying an app you may need to deploy additional services, this Github Ac
 ### Simple
 
 ```yaml
-- uses: convictional/trigger-workflow-and-wait@v1.3.0
+- uses: convictional/trigger-workflow-and-wait@v1.6.0
   with:
     owner: keithconvictional
     repo: myrepo
@@ -39,7 +39,7 @@ When deploying an app you may need to deploy additional services, this Github Ac
 ### All Options
 
 ```yaml
-- uses: convictional/trigger-workflow-and-wait@v1.3.0
+- uses: convictional/trigger-workflow-and-wait@v1.6.0
   with:
     owner: keithconvictional
     repo: myrepo
@@ -47,8 +47,8 @@ When deploying an app you may need to deploy additional services, this Github Ac
     github_user: github-user
     workflow_file_name: main.yml
     ref: release-branch
-    waiting_interval: 10
-    inputs: '{}'
+    wait_interval: 10
+    client_payload: '{}'
     propagate_failure: false
     trigger_workflow: true
     wait_workflow: true
@@ -60,17 +60,18 @@ When deploying an app you may need to deploy additional services, this Github Ac
 You can test out the action locally by cloning the repository to your computer. You can run:
 
 ```shell
-INPUT_WAITING_INTERVAL=10 \
-  INPUT_PROPAGATE_FAILURE=false \
-  INPUT_TRIGGER_WORKFLOW=true \
-  INPUT_WORKFLOW_FILE_NAME="main.yml" \
-  INPUT_GITHUB_USER="github-user" \
-  INPUT_WAIT_WORKFLOW=true \
-  INPUT_OWNER="keithconvictional" \
-  INPUT_REPO="trigger-workflow-and-wait-example-repo1" \
-  INPUT_GITHUB_TOKEN="<REDACTED>" \
-  INPUT_INPUTS='{}' \
-  bash entrypoint.sh
+INPUT_OWNER="keithconvictional" \
+INPUT_REPO="myrepo" \
+INPUT_GITHUB_TOKEN="<REDACTED>" \
+INPUT_GITHUB_USER="github-user" \
+INPUT_WORKFLOW_FILE_NAME="main.yml" \
+INPUT_REF="release-branch" \
+INPUT_WAIT_INTERVAL=10 \
+INPUT_CLIENT_PAYLOAD='{}' \
+INPUT_PROPAGATE_FAILURE=false \
+INPUT_TRIGGER_WORKFLOW=true \
+INPUT_WAIT_WORKFLOW=true \
+busybox sh entrypoint.sh
 ```
 
 You will have to create a Github Personal access token. You can create a test workflow to be executed. In a repository, add a new `main.yml` to `.github/workflows/`. The workflow will be:
@@ -102,16 +103,12 @@ You can see the example [here](https://github.com/keithconvictional/trigger-work
 
 ## Potential Issues
 
-### Timing
-
-The actions dispatch is an asynchronous job and it at times can take a few seconds to start. If you do not have a delay, it may be started after the action has checked if it was successful. ie. Start dispatch call --> No delay --> Check if successful --> Actually starts. If the workflow has run before, it will just complete immediately as a successful run. You can solve this by simply increasing the delay to a few seconds. By default it is 10 seconds. Creating a large delay between checks will help the traffic to the Github API.
-
 ### Changes
 
 If you do not want the latest build all of the time, please use a versioned copy of the Github Action. You specify the version after the `@` sign.
 
 ```yaml
-- uses: convictional/trigger-workflow-and-wait@v1.3.0
+- uses: convictional/trigger-workflow-and-wait@v1.6.0
   with:
     owner: keithconvictional
     repo: myrepo
